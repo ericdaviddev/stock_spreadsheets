@@ -20,11 +20,11 @@ To use this VBA macro in **Microsoft Excel**, follow these steps:
 4. The macro will now appear under `"Modules"` in your VBA Editor.
 
 ## 🛠️ How to Run the Macro
-1. I have a batch file (windows - see below) 
+1. I have a batch file (windows - each line has a number below) 
 2. The arguments are: folder_path (where main.py is), where to look for symbol files, output_file, exclusion_file, macro_file, macro_name
 3. @echo off
-python "C:\SomeLocation\stock_spreadsheets\api\main.py" "C:\SomeLocation\Downloads" "C:\SomeLocation\Documents\price_sheet.xlsx" "C:\SomeLocation\stock_spreadsheets\ExcludeSymbolsList.xlsx" "C:\SomeLocation\stock_spreadsheets\StockSymbolMacro.xlsm" "ProcessExclusionsAndTotals"
-pause
+4. python "C:\SomeLocation\stock_spreadsheets\api\main.py" "C:\SomeLocation\Downloads" "C:\SomeLocation\Documents\price_sheet.xlsx" "C:\SomeLocation\stock_spreadsheets\ExcludeSymbolsList.xlsx" "C:\SomeLocation\stock_spreadsheets\StockSymbolMacro.xlsm" "ProcessExclusionsAndTotals"
+5. pause
 
 
 ## 📌 Requirements
