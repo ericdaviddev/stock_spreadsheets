@@ -20,15 +20,12 @@ To use this VBA macro in **Microsoft Excel**, follow these steps:
 4. The macro will now appear under `"Modules"` in your VBA Editor.
 
 ## 🛠️ How to Run the Macro
-1. **Ensure your downloaded brokerage file is open in Excel**.
-2. Open the **VBA Editor (`Alt + F11`)**.
-3. Select the **Module1** module.
-4. Run the macro by pressing `F5` or using `"Run"` from the VBA Editor toolbar.
-5. The macro will:
-   - Filter out excluded symbols.
-   - Sum relevant columns.
-   - Apply basic formatting.
-6. **Check the final processed spreadsheet** for key changes.
+1. I have a batch file (windows - see below) 
+2. The arguments are: folder_path (where main.py is), where to look for symbol files, output_file, exclusion_file, macro_file, macro_name
+3. @echo off
+python "C:\SomeLocation\stock_spreadsheets\api\main.py" "C:\SomeLocation\Downloads" "C:\SomeLocation\Documents\price_sheet.xlsx" "C:\SomeLocation\stock_spreadsheets\ExcludeSymbolsList.xlsx" "C:\SomeLocation\stock_spreadsheets\StockSymbolMacro.xlsm" "ProcessExclusionsAndTotals"
+pause
+
 
 ## 📌 Requirements
 - **Microsoft Excel (2016 or later recommended)**.
