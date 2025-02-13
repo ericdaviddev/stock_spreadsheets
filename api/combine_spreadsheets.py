@@ -4,9 +4,8 @@ import pandas as pd
 import os
 import win32com.client as win32
 from run_macros import run_macro_on_workbook
-from config import numeric_columns, percentage_columns
-
-startsWithColumns = ["The data and information", "Brokerage services are", "Date downloaded"]
+from config import startsWithColumns, numeric_columns, percentage_columns
+from datetime import datetime
 
 def clean_and_combine_sheets(folder_path, output_file,  exclusion_file, macro_file, macro_name, data_types=None):
     """
@@ -56,6 +55,7 @@ def clean_and_combine_sheets(folder_path, output_file,  exclusion_file, macro_fi
         remove_non_numeric_characters(main_df, percentage_columns)
 
         # Save the main sheet
+        output_file = add_time_stamp(output_file)
         main_df.to_excel(output_file, index=False)
         run_macro_on_workbook(macro_file, output_file, macro_name, exclusion_file)
         apply_formatting(output_file, numeric_columns, percentage_columns)
@@ -63,6 +63,14 @@ def clean_and_combine_sheets(folder_path, output_file,  exclusion_file, macro_fi
     else:
         print("No valid files were found to process.")
 
+def add_time_stamp(filename):
+    # Generate timestamp
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    # Insert timestamp before file extension
+    name, ext = filename.rsplit(".", 1)  # Splitting filename and extension
+    new_filename = f"{name}_{timestamp}.{ext}"
+    return new_filename
 
 def remove_non_numeric_characters(main_df, columns):
     for col in columns:
