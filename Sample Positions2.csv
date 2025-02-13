@@ -1,0 +1,48 @@
+﻿Account Number,Account Name,Symbol,Description,Quantity,Last Price,Last Price Change,Current Value,Today's Gain/Loss Dollar,Today's Gain/Loss Percent,Total Gain/Loss Dollar,Total Gain/Loss Percent,Percent Of Account,Cost Basis Total,Average Cost Basis,Type
+123,YourAccountName,FDRXX**,HELD IN MONEY MARKET,,,,$579.32 ,,,,,0.08%,,,Cash
+123,YourAccountName,COST,COSTCO WHOLESALE CORP COM,85.258,"$1,064.46 ",$6.12 ,"$90,753.30 ",$521.35 ,0.57%,"$71,051.63 ",360.63%,12.37%,"$19,701.67 ",$231.08 ,Cash
+123,YourAccountName,WMT,WALMART INC COM,284.207,$103.50 ,$1.03 ,"$29,415.42 ",$292.73 ,1.00%,"$22,239.28 ",309.90%,4.01%,"$7,176.14 ",$25.25 ,Cash
+123,YourAccountName,PFE,PFIZER INC,430.609,$25.51 ,($0.02),"$10,984.83 ",($8.62),-0.08%,"$6,884.86 ",167.92%,1.50%,"$4,099.97 ",$9.52 ,Cash
+123,YourAccountName,ITOT,ISHARES CORE S&P TOTAL US STOCK MARKET ETF,1217.479,$132.67 ,($0.32),"$161,518.31 ",($394.22),-0.25%,"$98,320.39 ",155.57%,22.01%,"$63,197.92 ",$51.91 ,Cash
+123,YourAccountName,AXON,AXON ENTERPRISE INC COM,5.303,$663.73 ,($5.53),"$3,519.76 ",($29.33),-0.83%,"$1,729.78 ",96.63%,0.48%,"$1,789.98 ",$337.54 ,Cash
+123,YourAccountName,VNQ,VANGUARD REAL ESTATE ETF,152.575,$91.26 ,($0.74),"$13,923.23 ",($112.15),-0.80%,"$6,385.34 ",84.70%,1.90%,"$7,537.89 ",$49.40 ,Cash
+123,YourAccountName,VBK,VANGUARD SMALL-CAP GROWTH INDEX FUND,121.716,$287.02 ,($0.99),"$34,934.76 ",($120.66),-0.35%,"$15,465.20 ",79.43%,4.76%,"$19,469.56 ",$159.96 ,Cash
+123,YourAccountName,VBR,VANGUARD SMALL CAP VALUE ETF,333.648,$201.53 ,($2.03),"$67,240.08 ",($677.31),-1.00%,"$29,264.57 ",77.06%,9.16%,"$37,975.51 ",$113.82 ,Cash
+123,YourAccountName,VEA,VANGUARD DEVELOPED MARKETS INDEX FUND ETF,300.316,$50.86 ,$0.13 ,"$15,273.98 ",$38.95 ,0.25%,"$5,471.66 ",55.82%,2.08%,"$9,802.32 ",$32.64 ,Cash
+123,YourAccountName,IXUS,ISHARES TR CORE MSCI TOTAL,514.571,$69.80 ,$0.24 ,"$35,914.48 ",$120.92 ,0.33%,"$10,654.40 ",42.17%,4.89%,"$25,260.08 ",$49.09 ,Cash
+123,YourAccountName,NOW,SERVICENOW INC COM USD0.001,1.428,$986.97 ,($22.08),"$1,409.39 ",($31.54),-2.19%,$409.68 ,40.98%,0.19%,$999.71 ,$700.08 ,Cash
+123,YourAccountName,PSTG,PURE STORAGE INC CL A,41.444,$67.55 ,$0.23 ,"$2,799.54 ",$9.53 ,0.34%,$756.74 ,37.04%,0.38%,"$2,042.80 ",$49.29 ,Cash
+123,YourAccountName,VSS,VANGUARD INTL EQUITY INDEX FDS FTSE SMCAP ETF,125.277,$116.96 ,($0.10),"$14,651.77 ",($11.91),-0.09%,"$3,959.44 ",37.03%,2.00%,"$10,692.33 ",$85.35 ,Cash
+123,YourAccountName,CRWD,CROWDSTRIKE HLDGS INC CL A,22.667,$436.10 ,$4.46 ,"$9,885.07 ",$101.09 ,1.03%,"$2,558.07 ",34.91%,1.35%,"$7,327.00 ",$323.25 ,Cash
+123,YourAccountName,V,VISA INC,10.887,$350.71 ,($0.01),"$3,818.17 ",($0.11),-0.01%,$818.32 ,27.27%,0.52%,"$2,999.85 ",$275.54 ,Cash
+123,YourAccountName,FSPTX,FIDELITY SELECT TECHNOLOGY,315.573,$36.76 ,($0.06),"$11,600.46 ",($18.94),-0.17%,"$2,190.52 ",23.27%,1.58%,"$9,409.94 ",$29.82 ,Cash
+123,YourAccountName,SOXX,ISHARES TR ISHARES SEMICDTR,69.964,$219.90 ,$0.00 ,"$15,385.08 ",$0.00 ,0.00%,"$2,780.20 ",22.05%,2.10%,"$12,604.88 ",$180.16 ,Cash
+123,YourAccountName,LRCX,LAM RESEARCH CORP COM NEW,50.104,$81.95 ,($1.31),"$4,106.02 ",($65.64),-1.58%,$606.03 ,17.31%,0.56%,"$3,499.99 ",$69.85 ,Cash
+123,YourAccountName,ACN,ACCENTURE PLC,2.981,$388.79 ,($1.22),"$1,158.98 ",($3.64),-0.32%,$158.99 ,15.89%,0.16%,$999.99 ,$335.45 ,Cash
+123,YourAccountName,IEMG,ISHARES CORE MSCI EMERGING MARKETS ETF,188.462,$54.29 ,$0.32 ,"$10,230.65 ",$59.36 ,0.58%,"$1,378.75 ",15.57%,1.39%,"$8,851.90 ",$46.97 ,Cash
+123,YourAccountName,MELI,MERCADOLIBRE INC COM USD0.001,3.534,"$2,016.01 ",($19.17),"$7,124.57 ",($67.75),-0.95%,$921.14 ,14.84%,0.97%,"$6,203.43 ","$1,755.36 ",Cash
+123,YourAccountName,BRKB,BERKSHIRE HATHAWAY INC COM USD0.0033 CLASS B,10.689,$471.07 ,($1.55),"$5,035.21 ",($16.52),-0.33%,$636.12 ,14.46%,0.69%,"$4,399.09 ",$411.55 ,Cash
+123,YourAccountName,PLD,PROLOGIS INC. COM,58.033,$120.47 ,($1.30),"$6,991.23 ",($75.45),-1.07%,$780.69 ,12.57%,0.95%,"$6,210.54 ",$107.02 ,Cash
+123,YourAccountName,GEV,GE VERNOVA INC COM,13.279,$371.71 ,($1.19),"$4,935.93 ",($15.81),-0.32%,$436.01 ,9.68%,0.67%,"$4,499.92 ",$338.87 ,Cash
+123,YourAccountName,IEI,ISHARES TR 3 7 YR TREAS BD,6.822,$115.28 ,($0.50),$786.44 ,($3.42),-0.44%,$49.65 ,6.73%,0.11%,$736.79 ,$108.00 ,Cash
+123,YourAccountName,MSFT,MICROSOFT CORP,8.512,$408.35 ,($3.10),"$3,475.83 ",($26.35),-0.76%,$131.56 ,3.93%,0.47%,"$3,344.27 ",$392.89 ,Cash
+123,YourAccountName,CMI,CUMMINS INC,9.678,$365.68 ,($6.88),"$3,539.00 ",($66.54),-1.85%,$39.35 ,1.12%,0.48%,"$3,499.65 ",$361.61 ,Cash
+123,YourAccountName,ABBNY,ABB LTD SPON ADR EACH REP 1 ORD SHS,65,$55.64 ,$0.19 ,"$3,616.60 ",$12.61 ,0.34%,$5.52 ,0.15%,0.49%,"$3,611.08 ",$55.56 ,Cash
+123,YourAccountName,BAM,BROOKFIELD ASSET MANAGEMENT LTD CLASS A LTD VOTING SHS ISIN #CA1130041058 SEDOL #BPCPYH2,63.458,$55.05 ,($0.60),"$3,493.36 ",($38.08),-1.08%,($6.59),-0.19%,0.48%,"$3,499.95 ",$55.15 ,Cash
+123,YourAccountName,ROIV,ROIVANT SCIENCES LTD SHS ISIN #BMG762791017,90.489,$10.50 ,$0.01 ,$949.68 ,$0.45 ,0.04%,($52.93),-5.28%,0.13%,"$1,002.61 ",$11.08 ,Cash
+123,YourAccountName,LECO,LINCOLN ELECTRIC HOLDINGS INC,17.114,$193.57 ,$0.07 ,"$3,312.75 ",$1.19 ,0.03%,($187.05),-5.35%,0.45%,"$3,499.80 ",$204.50 ,Cash
+123,YourAccountName,BNTX,BIONTECH SE SPON ADS EACH REP 1 ORD SHS,9.124,$112.33 ,($2.17),"$1,024.89 ",($19.80),-1.90%,($89.62),-8.05%,0.14%,"$1,114.51 ",$122.15 ,Cash
+123,YourAccountName,FLR,FLUOR CORP COM USD0.01,48.833,$46.54 ,($1.32),"$2,272.68 ",($64.46),-2.76%,($300.19),-11.67%,0.31%,"$2,572.87 ",$52.69 ,Cash
+123,YourAccountName,CCJ,CAMECO CORP COM NPV ISIN #CA13321L1085 SEDOL #2166160,69.774,$49.65 ,($0.20),"$3,464.27 ",($13.96),-0.41%,($485.67),-12.30%,0.47%,"$3,949.94 ",$56.61 ,Cash
+123,YourAccountName,AGG,ISHARES CORE US AGGREGATE BOND ETF,887.439,$96.79 ,($0.49),"$85,890.78 ",($430.41),-0.50%,"($13,060.10)",-13.20%,11.70%,"$98,950.88 ",$111.50 ,Cash
+123,YourAccountName,BX,BLACKSTONE INC,21.571,$160.51 ,($4.27),"$3,462.36 ",($92.11),-2.60%,($537.59),-13.44%,0.47%,"$3,999.95 ",$185.43 ,Cash
+123,YourAccountName,VWOB,VANGUARD WHITEHALL FDS EM MK GOV BD ETF,763.136,$63.73 ,($0.22),"$48,630.84 ",($164.08),-0.34%,"($8,324.35)",-14.62%,6.63%,"$56,955.19 ",$74.63 ,Cash
+123,YourAccountName,FSLR,FIRST SOLAR INC,25.852,$159.40 ,($2.21),"$4,120.67 ",($57.01),-1.37%,($879.14),-17.59%,0.56%,"$4,999.81 ",$193.40 ,Cash
+123,YourAccountName,TMDX,TRANSMEDICS GROUP INC COM,20.716,$69.96 ,$1.85 ,"$1,449.29 ",$38.32 ,2.71%,($902.37),-38.38%,0.20%,"$2,351.66 ",$113.52 ,Cash
+123,YourAccountName,FLNC,FLUENCE ENERGY INC COM CL A,191.755,$6.57 ,($0.44),"$1,258.87 ",($83.42),-6.22%,"($2,741.12)",-68.53%,0.17%,"$3,999.99 ",$20.86 ,Cash
+,,,,,,,,,,,,,,,
+The data and information in this spreadsheet is provided to you solely for your use and is not for distribution… blah blah blah,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Brokerage services are provided by… some brokerage,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Date downloaded Feb-12-2025 3:27 p.m ET,,,,,,,,,,,,,,,
