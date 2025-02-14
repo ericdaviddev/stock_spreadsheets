@@ -7,6 +7,17 @@ from run_macros import run_macro_on_workbook
 from config import startsWithColumns, numeric_columns, percentage_columns
 from datetime import datetime
 
+import logging
+
+# Configure logging
+logging.basicConfig(
+    filename="error_log.txt",  # Log file name
+    filemode="a",  # Append mode (use "w" for overwrite)
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
+    datefmt="%Y-%m-%d %H:%M:%S",  # Timestamp format
+    level=logging.ERROR  # Log only errors and critical messages
+)
+
 def clean_and_combine_sheets(folder_path, output_file,  exclusion_file, macro_file, macro_name, data_types=None):
     """
     Combine and clean spreadsheets from a folder into a single main file.
@@ -18,52 +29,82 @@ def clean_and_combine_sheets(folder_path, output_file,  exclusion_file, macro_fi
     :param output_file: Path to save the combined main file
     :param data_types: Dictionary specifying data types for columns (optional)
     """
-    # Close main_sheet if it's open
-    # close_if_open(output_file)
 
+    excel = win32.Dispatch("Excel.Application")
+    all_data = process_files(folder_path)
+
+    # Combine all data into one main DataFrame
+    if all_data:
+        try:
+            output_file = process_data(all_data, excel, exclusion_file, macro_file, macro_name, output_file)
+            print(f"Price sheet saved to {output_file}")
+        except Exception as e:
+            print(f"Error processing data: {e}")
+            logging.error(f"Error in {__name__}: {e}", exc_info=True)
+        finally:
+            excel.Quit()
+            del excel
+            gc.collect()
+    else:
+        print("No valid files were found to process.")
+
+def process_files(folder_path):
+    """
+    :param folder_path:
+    :return: data list
+    """
     all_data = []
-
     for file_name in os.listdir(folder_path):
-        # Skip unsupported file types
-        if not (file_name.endswith('.xlsx') or file_name.endswith('.csv')):
+        if not file_name.endswith(('.xlsx', '.csv')):  # Cleaner check
             print(f"Skipping unsupported file: {file_name}")
             continue
 
         file_path = os.path.join(folder_path, file_name)
-
         try:
-            # Load the file
-            if file_name.endswith('.xlsx'):
-                df = pd.read_excel(file_path)
-            elif file_name.endswith('.csv'):
-                df = pd.read_csv(file_path)
+            df = pd.read_excel(file_path) \
+                if file_name.endswith('.xlsx') else pd.read_csv(file_path)
+            df = clean_sheet(df)
+            all_data.append(df)
         except Exception as e:
-            print(f"Error reading file {file_name}: {e}")
-            continue
+            logging.error(f"Error in {__name__}: {e}", exc_info=True)
 
-        # Clean the data
-        df = clean_sheet(df)
+    return all_data
 
-        # Add to the combined data
-        all_data.append(df)
 
-    # Combine all data into one main DataFrame
-    if all_data:
-        main_df = pd.concat(all_data, ignore_index=True)
+def process_data(all_data, excel, exclusion_file, macro_file, macro_name, output_file):
+    """
+    :param all_data:
+    :param excel:
+    :param exclusion_file:
+    :param macro_file:
+    :param macro_name:
+    :param output_file:
+    :return:
+    """
+    main_df = pd.concat(all_data, ignore_index=True)
+    remove_non_numeric_characters(main_df, numeric_columns)
+    remove_non_numeric_characters(main_df, percentage_columns)
+    # Save the main sheet
+    output_file = add_time_stamp(output_file)
+    # main_df.to_excel(output_file, index=False)
 
-        remove_non_numeric_characters(main_df, numeric_columns)
-        remove_non_numeric_characters(main_df, percentage_columns)
+    with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
+        main_df.to_excel(writer, index=False)
 
-        # Save the main sheet
-        output_file = add_time_stamp(output_file)
-        main_df.to_excel(output_file, index=False)
-        run_macro_on_workbook(macro_file, output_file, macro_name, exclusion_file)
-        apply_formatting(output_file, numeric_columns, percentage_columns)
-        print(f"Price sheet saved to {output_file}")
-    else:
-        print("No valid files were found to process.")
+    # Open the workbook containing the macro
+    macro_workbook = excel.Workbooks.Open(macro_file)
+    # Open the target workbook (where the macro will operate)
+    target_workbook = excel.Workbooks.Open(output_file)
+    run_macro_on_workbook(excel, macro_workbook, target_workbook, macro_name, exclusion_file)
+    apply_formatting(excel, output_file, numeric_columns, percentage_columns)
+    return output_file
+
 
 def add_time_stamp(filename):
+    """
+    :param filename:
+    :return: filename with time stamp before extension
+    """
     # Generate timestamp
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -73,26 +114,7 @@ def add_time_stamp(filename):
     return new_filename
 
 def remove_non_numeric_characters(main_df, columns):
-    for col in columns:
-        if col in main_df.columns:
-            main_df[col] = main_df[col].replace(r'[^\d.-]', '', regex=True)  # Remove non-numeric characters
-            main_df[col] = pd.to_numeric(main_df[col], errors='coerce')  # Convert to float
-
-
-def close_if_open(file_path):
-    excel = win32.Dispatch("Excel.Application")
-    try:
-        for workbook in excel.Workbooks:
-            if workbook.FullName.lower() == file_path.lower():
-                workbook.Close(SaveChanges=False)
-                gc.collect()
-                excel.Quit()
-                print(f"Closed open workbook: {file_path}")
-    except Exception as e:
-        print(f"An error occurred during close_if_open: {e}")
-    finally:
-        del excel
-        gc.collect()
+    main_df[columns] = main_df[columns].replace(r'[^\d.-]', '', regex=True).apply(pd.to_numeric, errors='coerce')
 
 def clean_sheet(df):
     """
@@ -109,13 +131,14 @@ def clean_sheet(df):
 
     return df
 
-def apply_formatting(target_file, numeric_columns, percentage_columns):
+def apply_formatting(excel, target_file, numbers, percentages):
     """
     Apply formatting to specific columns in an Excel file.
+    :param excel: 
+    :param numbers: 
+    :param percentages: 
     :param target_file: Path to the Excel file.
     """
-    excel = win32.Dispatch("Excel.Application")
-    # excel.Visible = True  # Keep Excel visible for debugging
 
     try:
         # Open the workbook
@@ -123,25 +146,21 @@ def apply_formatting(target_file, numeric_columns, percentage_columns):
         ws = wb.Sheets(1)  # Adjust the sheet index or name as needed
 
         # Example 1: Format a column as currency
-        for col in numeric_columns:
-            # ws.Columns(col).NumberFormat = "$#,##0.00"  # Currency with 2 decimal places
+        for col in numbers:
             ws.Columns(get_column_index_by_heading(ws, col)).NumberFormat = "$#,##0.00;[Red]($#,##0.00)"  # Red font for negative numbers
 
-        for col in percentage_columns:
+        for col in percentages:
             format_percentage_column(ws, col)
-            # ws.Columns(get_column_index_by_heading(ws, col)).NumberFormat = "0.00%"  # Percentage with 2 decimal places
 
         freeze_panes(wb)
-        autofit_columns_by_heading(wb.Sheets(1), numeric_columns + percentage_columns)
-        # Save changes
+        autofit_columns_by_heading(wb.Sheets(1), numbers + percentages)
         wb.Save()
-        # wb.Close()
         print(f"Formatting applied and workbook saved: {target_file}")
-        excel.Quit()
     except Exception as e:
         print(f"An error occurred while formatting: {e}")
+        logging.error(f"Error in {__name__}: {e}", exc_info=True)
     finally:
-        del wb, excel
+        del wb
         gc.collect()
 
 def format_percentage_column(ws, heading):
@@ -166,6 +185,9 @@ def format_percentage_column(ws, heading):
 
 
 def freeze_panes(target_workbook):
+    """
+    :param target_workbook: freezes rows/columns
+    """
     target_workbook.Application.ActiveWindow.SplitRow = 1  # Freeze top row
     target_workbook.Application.ActiveWindow.SplitColumn = 1  # Freeze first column
     target_workbook.Application.ActiveWindow.FreezePanes = True
@@ -189,21 +211,16 @@ def autofit_columns_by_heading(ws, headings):
                     break
     except Exception as e:
         print(f"An error occurred: {e}")
+        logging.error(f"Error in {__name__}: {e}", exc_info=True)
 
 
 def get_column_index_by_heading(ws, heading):
-    """
-    Get the column index of a specified column heading in an Excel sheet.
-    :param ws: The worksheet object.
-    :param heading: The column heading to search for.
-    :return: The column index (1-based) or None if not found.
-    """
-    # Iterate through the first row to find the heading
-    for col_index in range(1, ws.UsedRange.Columns.Count + 1):
-        cell_value = ws.Cells(1, col_index).Value  # Assuming headers are in the first row
-        if cell_value and cell_value.strip() == heading:
-            return col_index
-    return None
+    return next(
+        (col_index for col_index in range(1, ws.UsedRange.Columns.Count + 1)
+         if ws.Cells(1, col_index).Value and ws.Cells(1, col_index).Value.strip() == heading),
+        None
+    )
+
 
 # Example usage
 # folder_path = "C:/path/to/spreadsheets"
