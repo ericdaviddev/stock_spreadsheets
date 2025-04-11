@@ -1,230 +1,259 @@
 import gc
-
 import pandas as pd
 import os
+from typing import List, Dict, Any, Optional
 import win32com.client as win32
+from contextlib import contextmanager
 from run_macros import run_macro_on_workbook
 from config import startsWithColumns, numeric_columns, percentage_columns
 from datetime import datetime
+from utils import ExcelFormatter, add_timestamp_to_filename, clean_dataframe
+from pathlib import Path
 
 import logging
 
 # Configure logging
 logging.basicConfig(
-    filename="error_log.txt",  # Log file name
-    filemode="a",  # Append mode (use "w" for overwrite)
-    format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
-    datefmt="%Y-%m-%d %H:%M:%S",  # Timestamp format
-    level=logging.ERROR  # Log only errors and critical messages
+    filename="error_log.txt",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.ERROR
 )
 
-def clean_and_combine_sheets(folder_path, output_file,  exclusion_file, macro_file, macro_name, data_types=None):
+@contextmanager
+def excel_application():
+    """Context manager for Excel application to ensure proper cleanup."""
+    excel = win32.Dispatch("Excel.Application")
+    try:
+        yield excel
+    finally:
+        excel.Quit()
+        del excel
+        gc.collect()
+
+def validate_inputs(folder_path: str, output_file_path: str, exclusion_file_path: str, macro_file_path: str) -> None:
+    """
+    Validate input paths before processing.
+    
+    Args:
+        folder_path: Path to input folder
+        output_file_path: Path to output file
+        exclusion_file_path: Path to exclusion file
+        macro_file_path: Path to macro file
+    
+    Raises:
+        ValueError: If any path is invalid
+    """
+    if not os.path.exists(folder_path):
+        raise ValueError(f"Input folder not found: {folder_path}")
+    if not os.path.exists(exclusion_file_path):
+        raise ValueError(f"Exclusion file not found: {exclusion_file_path}")
+    if not os.path.exists(macro_file_path):
+        raise ValueError(f"Macro file not found: {macro_file_path}")
+    output_dir = os.path.dirname(output_file_path)
+    if not os.path.exists(output_dir):
+        raise ValueError(f"Output directory does not exist: {output_dir}")
+
+def combine_and_clean_sheets(
+    folder_path: str,
+    output_file_path: str,
+    exclusion_file_path: str,
+    macro_file_path: str,
+    macro_name: str,
+    data_types: Optional[Dict[str, Any]] = None
+) -> str:
     """
     Combine and clean spreadsheets from a folder into a single main file.
 
-    :param macro_name:
-    :param macro_file:
-    :param exclusion_file:
-    :param folder_path: Path to the folder containing spreadsheets
-    :param output_file: Path to save the combined main file
-    :param data_types: Dictionary specifying data types for columns (optional)
+    Args:
+        folder_path: Path to the folder containing spreadsheets
+        output_file_path: Path to save the combined main file
+        exclusion_file_path: Path to get excluded symbols and columns to sum
+        macro_file_path: Path to get the macro workbook
+        macro_name: Name of the macro
+        data_types: Optional dictionary specifying data types for columns
+    
+    Returns:
+        str: Path to the processed output file
+    
+    Raises:
+        ValueError: If input validation fails or no valid files found
     """
+    try:
+        validate_inputs(folder_path, output_file_path, exclusion_file_path, macro_file_path)
+        
+        all_dataframes = process_files(folder_path, data_types)
+        if not all_dataframes:
+            raise ValueError("No valid files were found to process")
+        
+        with excel_application() as excel:
+            output_file_path = process_data(
+                all_dataframes,
+                excel,
+                exclusion_file_path,
+                macro_file_path,
+                macro_name,
+                output_file_path
+            )
+            logging.info(f"Price sheet saved to {output_file_path}")
+            return output_file_path
+            
+    except Exception as e:
+        logging.error(f"Error in combine_and_clean_sheets: {e}", exc_info=True)
+        raise
 
-    excel = win32.Dispatch("Excel.Application")
-    all_data = process_files(folder_path)
-
-    # Combine all data into one main DataFrame
-    if all_data:
-        try:
-            output_file = process_data(all_data, excel, exclusion_file, macro_file, macro_name, output_file)
-            print(f"Price sheet saved to {output_file}")
-        except Exception as e:
-            print(f"Error processing data: {e}")
-            logging.error(f"Error in {__name__}: {e}", exc_info=True)
-        finally:
-            excel.Quit()
-            del excel
-            gc.collect()
-    else:
-        print("No valid files were found to process.")
-
-def process_files(folder_path):
+def process_files(folder_path: str, data_types: Optional[Dict[str, Any]] = None) -> List[pd.DataFrame]:
     """
-    :param folder_path:
-    :return: data list
+    Process Excel and CSV files in the given folder.
+    
+    Args:
+        folder_path: Path to folder containing spreadsheets
+        data_types: Optional dictionary specifying data types for columns
+    
+    Returns:
+        List of processed DataFrames
+    
+    Raises:
+        ValueError: If no valid files are found
     """
     all_data = []
-    for file_name in os.listdir(folder_path):
-        if not file_name.endswith(('.xlsx', '.csv')):  # Cleaner check
-            print(f"Skipping unsupported file: {file_name}")
-            continue
-
+    valid_extensions = {'.xlsx', '.csv'}
+    files = [f for f in os.listdir(folder_path) if Path(f).suffix.lower() in valid_extensions]
+    
+    if not files:
+        raise ValueError(f"No valid files found in {folder_path}")
+    
+    for file_name in files:
         file_path = os.path.join(folder_path, file_name)
         try:
-            df = pd.read_excel(file_path) \
-                if file_name.endswith('.xlsx') else pd.read_csv(file_path)
-            df = clean_sheet(df)
+            # First read without dtype to avoid conversion errors
+            df = pd.read_excel(file_path) if file_name.endswith('.xlsx') else pd.read_csv(file_path)
+            
+            # Clean the data first
+            df = clean_dataframe(df, startsWithColumns)
+            
+            # Then apply data types after cleaning, with coerce for numeric columns
+            # if data_types:
+            #     for col, dtype in data_types.items():
+            #         if col in df.columns:
+            #             try:
+            #                 if dtype in (float, 'float64'):
+            #                     df[col] = pd.to_numeric(df[col], errors='coerce')
+            #                 else:
+            #                     df[col] = df[col].astype(dtype)
+            #             except Exception as type_error:
+            #                 logging.warning(f"Could not convert column {col} to {dtype}: {type_error}")
+            #
             all_data.append(df)
+            logging.info(f"Successfully processed {file_name}")
         except Exception as e:
-            logging.error(f"Error in {__name__}: {e}", exc_info=True)
+            logging.error(f"Error processing {file_name}: {e}", exc_info=True)
+            continue
 
     return all_data
 
-
-def process_data(all_data, excel, exclusion_file, macro_file, macro_name, output_file):
+def process_data(
+    all_data: List[pd.DataFrame],
+    excel: Any,
+    exclusion_file: str,
+    macro_file: str,
+    macro_name: str,
+    output_file: str
+) -> str:
     """
-    :param all_data:
-    :param excel:
-    :param exclusion_file:
-    :param macro_file:
-    :param macro_name:
-    :param output_file:
-    :return:
+    Process and format combined data.
+    
+    Args:
+        all_data: List of DataFrames to process
+        excel: Excel application object
+        exclusion_file: Path to exclusion file
+        macro_file: Path to macro file
+        macro_name: Name of macro to run
+        output_file: Output file path
+    
+    Returns:
+        Path to processed output file
+    
+    Raises:
+        ValueError: If data processing fails
     """
-    main_df = pd.concat(all_data, ignore_index=True)
-    remove_non_numeric_characters(main_df, numeric_columns)
-    remove_non_numeric_characters(main_df, percentage_columns)
-    # Save the main sheet
-    output_file = add_time_stamp(output_file)
-    # main_df.to_excel(output_file, index=False)
+    macro_workbook = None
+    target_workbook = None
+    try:
+        main_df = pd.concat(all_data, ignore_index=True)
+        remove_non_numeric_characters(main_df, numeric_columns)
+        remove_non_numeric_characters(main_df, percentage_columns)
+        
+        output_file = add_timestamp_to_filename(output_file)
+        
+        with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
+            main_df.to_excel(writer, index=False)
+        
+        # Open workbooks
+        macro_workbook = excel.Workbooks.Open(macro_file)
+        target_workbook = excel.Workbooks.Open(output_file)
+        
+        # Run macro
+        run_macro_on_workbook(excel, macro_workbook, target_workbook, macro_name, exclusion_file)
+        
+        # Format workbook
+        formatter = ExcelFormatter()
+        formatter.format_numeric_columns(target_workbook.Sheets(1), numeric_columns)
+        formatter.format_percentage_columns(target_workbook.Sheets(1), percentage_columns)
+        formatter.freeze_panes(target_workbook)
+        
+        # Save and close
+        target_workbook.Save()
+        return output_file
+        
+    except Exception as e:
+        logging.error(f"Error in process_data: {e}", exc_info=True)
+        raise ValueError(f"Failed to process data: {str(e)}")
+    finally:
+        # Clean up Excel workbooks
+        try:
+            if macro_workbook is not None:
+                macro_workbook.Close(SaveChanges=False)
+        except:
+            pass
+            
+        try:
+            if target_workbook is not None:
+                target_workbook.Close(SaveChanges=True)
+        except:
+            pass
 
-    with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
-        main_df.to_excel(writer, index=False)
-
-    # Open the workbook containing the macro
-    macro_workbook = excel.Workbooks.Open(macro_file)
-    # Open the target workbook (where the macro will operate)
-    target_workbook = excel.Workbooks.Open(output_file)
-    run_macro_on_workbook(excel, macro_workbook, target_workbook, macro_name, exclusion_file)
-    apply_formatting(excel, output_file, numeric_columns, percentage_columns)
-    return output_file
-
-
-def add_time_stamp(filename):
+def remove_non_numeric_characters(df: pd.DataFrame, columns: List[str]) -> None:
     """
-    :param filename:
-    :return: filename with time stamp before extension
+    Remove non-numeric characters from specified columns.
+    
+    Args:
+        df: DataFrame to process
+        columns: List of column names to clean
     """
-    # Generate timestamp
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    try:
+        df[columns] = df[columns].replace(r'[^\d.-]', '', regex=True).apply(pd.to_numeric, errors='coerce')
+    except Exception as e:
+        logging.error(f"Error cleaning numeric columns: {e}", exc_info=True)
+        raise
 
-    # Insert timestamp before file extension
-    name, ext = filename.rsplit(".", 1)  # Splitting filename and extension
-    new_filename = f"{name}_{timestamp}.{ext}"
-    return new_filename
-
-def remove_non_numeric_characters(main_df, columns):
-    main_df[columns] = main_df[columns].replace(r'[^\d.-]', '', regex=True).apply(pd.to_numeric, errors='coerce')
-
-def clean_sheet(df):
+def clean_dataframe(df: pd.DataFrame, startsWithColumns: List[str]) -> pd.DataFrame:
     """
     Clean the DataFrame by removing unwanted rows and standardizing columns.
+    
+    Args:
+        df: DataFrame to clean
+        startsWithColumns: List of column prefixes to exclude
+    
+    Returns:
+        pd.DataFrame: Cleaned DataFrame
     """
-    # Remove rows where the 'Description' column starts with "REMOVE"
     if "Account Number" in df.columns:
         for item in startsWithColumns:
             df = df[~df["Account Number"].str.startswith(item, na=False)]
 
-    # Additional cleaning logic (e.g., currency conversion, text trimming)
     for col in df.select_dtypes(include=['object']).columns:
-        df[col] = df[col].str.strip()  # Remove extra spaces
+        df[col] = df[col].str.strip()
 
     return df
-
-def apply_formatting(excel, target_file, numbers, percentages):
-    """
-    Apply formatting to specific columns in an Excel file.
-    :param excel: 
-    :param numbers: 
-    :param percentages: 
-    :param target_file: Path to the Excel file.
-    """
-
-    try:
-        # Open the workbook
-        wb = excel.Workbooks.Open(target_file)
-        ws = wb.Sheets(1)  # Adjust the sheet index or name as needed
-
-        # Example 1: Format a column as currency
-        for col in numbers:
-            ws.Columns(get_column_index_by_heading(ws, col)).NumberFormat = "$#,##0.00;[Red]($#,##0.00)"  # Red font for negative numbers
-
-        for col in percentages:
-            format_percentage_column(ws, col)
-
-        freeze_panes(wb)
-        autofit_columns_by_heading(wb.Sheets(1), numbers + percentages)
-        wb.Save()
-        print(f"Formatting applied and workbook saved: {target_file}")
-    except Exception as e:
-        print(f"An error occurred while formatting: {e}")
-        logging.error(f"Error in {__name__}: {e}", exc_info=True)
-    finally:
-        del wb
-        gc.collect()
-
-def format_percentage_column(ws, heading):
-    """
-    Format a column as a percentage, ensuring values are normalized.
-    :param ws: The worksheet object.
-    :param heading: The column heading to format as percentage.
-    """
-    col_index = get_column_index_by_heading(ws, heading)
-    if col_index:
-        # Normalize values by dividing by 100
-        for row_index in range(2, ws.UsedRange.Rows.Count + 1):  # Start from row 2 to skip the header
-            cell = ws.Cells(row_index, col_index)
-            if cell.Value is not None:  # Ensure the cell is not empty
-                cell.Value = cell.Value / 100
-
-        # Apply percentage format
-        ws.Columns(col_index).NumberFormat = "0.00%"
-        print(f"Percentage format applied to column: {heading}")
-    else:
-        print(f"Column '{heading}' not found.")
-
-
-def freeze_panes(target_workbook):
-    """
-    :param target_workbook: freezes rows/columns
-    """
-    target_workbook.Application.ActiveWindow.SplitRow = 1  # Freeze top row
-    target_workbook.Application.ActiveWindow.SplitColumn = 1  # Freeze first column
-    target_workbook.Application.ActiveWindow.FreezePanes = True
-
-
-def autofit_columns_by_heading(ws, headings):
-    """
-    AutoFit specific columns based on their heading names.
-    :param ws: The worksheet object.
-    :param headings: List of column heading names to AutoFit.
-    """
-    try:
-        # Iterate through the specified headings
-        for heading in headings:
-            # Find the column index for the heading
-            for col_index in range(1, ws.UsedRange.Columns.Count + 1):
-                cell_value = ws.Cells(1, col_index).Value  # Assuming headers are in the first row
-                if cell_value and cell_value.strip() == heading:
-                    ws.Columns(col_index).AutoFit()  # AutoFit the matched column
-                    print(f"AutoFit applied to column: {heading}")
-                    break
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        logging.error(f"Error in {__name__}: {e}", exc_info=True)
-
-
-def get_column_index_by_heading(ws, heading):
-    return next(
-        (col_index for col_index in range(1, ws.UsedRange.Columns.Count + 1)
-         if ws.Cells(1, col_index).Value and ws.Cells(1, col_index).Value.strip() == heading),
-        None
-    )
-
-
-# Example usage
-# folder_path = "C:/path/to/spreadsheets"
-# output_file = "C:/path/to/main_spreadsheet.xlsx"
-# clean_and_combine_sheets(folder_path, output_file, data_types)
-
-
