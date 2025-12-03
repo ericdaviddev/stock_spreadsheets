@@ -58,6 +58,25 @@ class ExcelFormatter:
         target_workbook.Application.ActiveWindow.SplitColumn = 1
         target_workbook.Application.ActiveWindow.FreezePanes = True
 
+    @staticmethod
+    def autofit_columns_by_heading(ws, headings):
+        """
+        AutoFit specific columns based on their heading names.
+        :param ws: The worksheet object.
+        :param headings: List of column heading names to AutoFit.
+        """
+        try:
+            # Iterate through the specified headings
+            for heading in headings:
+                # Find the column index for the heading
+                for col_index in range(1, ws.UsedRange.Columns.Count + 1):
+                    cell_value = ws.Cells(1, col_index).Value  # Assuming headers are in the first row
+                    if cell_value and cell_value.strip() == heading:
+                        ws.Columns(col_index).AutoFit()  # AutoFit the matched column
+                        print(f"AutoFit applied to column: {heading}")
+                        break
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
 def get_column_index_by_heading(ws: Any, heading: str) -> Optional[int]:
     """Get column index by heading name.
