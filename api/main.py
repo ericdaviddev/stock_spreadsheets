@@ -1,4 +1,4 @@
-from combine_spreadsheets import clean_and_combine_sheets
+from combine_spreadsheets import combine_and_clean_sheets
 from run_macros import run_macro_on_workbook
 import argparse
 from config import data_types
@@ -13,7 +13,7 @@ def main(folder_path, output_file, exclusion_file, macro_file, macro_name):
     # macro_file = "C:/path/to/output/macro.xlsm"
     # macro_name = "ProcessExclusionsAndTotals"
 
-    clean_and_combine_sheets(folder_path, output_file, exclusion_file, macro_file, macro_name, data_types)
+    combine_and_clean_sheets(folder_path, output_file, exclusion_file, macro_file, macro_name, data_types)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
