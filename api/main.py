@@ -39,9 +39,9 @@ def main(
 
     combine_and_clean_sheets(
         folder_path=folder_path,
-        output_file=output_file,
-        exclusion_file=exclusion_file,
-        macro_file=macro_file,
+        output_file_path=output_file,
+        exclusion_file_path=exclusion_file,
+        macro_file_path=macro_file,
         macro_name=macro_name,
         data_types=data_types,
     )
