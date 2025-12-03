@@ -1,6 +1,4 @@
-import gc
 import logging
-from pathlib import Path
 
 def run_macro_on_workbook(excel, macro_workbook, target_workbook, macro_name, exclusion_file_path):
     """
