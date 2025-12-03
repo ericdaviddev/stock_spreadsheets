@@ -1,16 +1,15 @@
-import gc
-import pandas as pd
-import os
-from typing import List, Dict, Any, Optional
-import win32com.client as win32
-from contextlib import contextmanager
-from run_macros import run_macro_on_workbook
-from config import startsWithColumns, numeric_columns, percentage_columns
-from datetime import datetime
-from utils import ExcelFormatter, add_timestamp_to_filename, clean_dataframe
-from pathlib import Path
-
 import logging
+import os
+from contextlib import contextmanager
+from pathlib import Path
+from typing import List, Dict, Any, Optional
+
+import pandas as pd
+import win32com.client as win32
+
+from config import startsWithColumns, numeric_columns, percentage_columns, account_columns
+from run_macros import run_macro_on_workbook
+from utils import ExcelFormatter, add_timestamp_to_filename, clean_dataframe
 
 # Configure logging
 logging.basicConfig(
@@ -22,15 +21,21 @@ logging.basicConfig(
 )
 
 @contextmanager
-def excel_application():
-    """Context manager for Excel application to ensure proper cleanup."""
+def excel_application(quit_on_exit: bool = False):
+    """Context manager for Excel application to ensure proper cleanup.
+    
+    Args:
+        quit_on_exit: If True, Excel will quit when context manager exits. 
+                     If False, Excel will remain open.
+    """
     excel = win32.Dispatch("Excel.Application")
+    excel.Visible = True  # Make Excel window visible
     try:
         yield excel
     finally:
-        excel.Quit()
-        del excel
-        gc.collect()
+        if quit_on_exit:
+            excel.Quit()
+        # Removed gc.collect() as it may force Excel to close
 
 def validate_inputs(folder_path: str, output_file_path: str, exclusion_file_path: str, macro_file_path: str) -> None:
     """
@@ -87,7 +92,7 @@ def combine_and_clean_sheets(
         if not all_dataframes:
             raise ValueError("No valid files were found to process")
         
-        with excel_application() as excel:
+        with excel_application(quit_on_exit=False) as excel:
             output_file_path = process_data(
                 all_dataframes,
                 excel,
@@ -202,16 +207,15 @@ def process_data(
         formatter.format_numeric_columns(target_workbook.Sheets(1), numeric_columns)
         formatter.format_percentage_columns(target_workbook.Sheets(1), percentage_columns)
         formatter.freeze_panes(target_workbook)
-        
-        # Save and close
+        formatter.autofit_columns_by_heading(target_workbook.Sheets(1), numeric_columns + percentage_columns + account_columns)
+
+        # Save
         target_workbook.Save()
         return output_file
         
     except Exception as e:
         logging.error(f"Error in process_data: {e}", exc_info=True)
-        raise ValueError(f"Failed to process data: {str(e)}")
-    finally:
-        # Clean up Excel workbooks
+        # Only close workbooks if there was an error
         try:
             if macro_workbook is not None:
                 macro_workbook.Close(SaveChanges=False)
@@ -221,6 +225,14 @@ def process_data(
         try:
             if target_workbook is not None:
                 target_workbook.Close(SaveChanges=True)
+        except:
+            pass
+        raise ValueError(f"Failed to process data: {str(e)}")
+    finally:
+        # Only close the macro workbook in the finally block
+        try:
+            if macro_workbook is not None:
+                macro_workbook.Close(SaveChanges=False)
         except:
             pass
 

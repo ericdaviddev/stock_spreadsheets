@@ -1,8 +1,7 @@
-from combine_spreadsheets import combine_and_clean_sheets
-from run_macros import run_macro_on_workbook
 import argparse
+
+from combine_spreadsheets import combine_and_clean_sheets
 from config import data_types
-import win32com.client as win32
 
 
 def main(folder_path, output_file, exclusion_file, macro_file, macro_name):
