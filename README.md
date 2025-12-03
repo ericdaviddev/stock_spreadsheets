@@ -1,43 +1,92 @@
-# Stock Spreadsheet Processor VBA Macro
+# Stock Spreadsheets
 
-## 📌 Overview
-This VBA macro automates the processing of stock and bond position spreadsheets downloaded from a brokerage firm.  
-It allows users to **filter out specific stock symbols** (from an exclusion list) and **calculate key totals** for the remaining positions.  
-Additionally, the macro applies **basic formatting** to highlight important financial changes, making it easier to track gains and losses.
+I use this to quickly clean up/export brokerage position files and run my own analysis on whether paid stock-picking services add value versus sticking with simple index tracking. The goal is to automate the repetitive Excel steps so the process becomes a one-click workflow.
 
-## 🚀 Features
-- **Filters out excluded stock/bond symbols** so you can focus on relevant holdings.
-- **Sums up key financial values** (e.g., total gains/losses, current value).
-- **Formats the spreadsheet** for easier readability.
-- **Supports `.csv` and `.xlsx` files**.
-
-## 📂 Installation – How to Import the Macro
-To use this VBA macro in **Microsoft Excel**, follow these steps:
-
-1. **Open Excel** and press `Alt + F11` to open the **VBA Editor**.
-2. In the **VBA Project Explorer** (left panel), right-click on `"Modules"` and choose `"Import File..."`.
-3. Select the file: **`Module1.bas`** and click **Open**.
-4. The macro will now appear under `"Modules"` in your VBA Editor.
-
-## 🛠️ How to Run the Macro
-1. I have a batch file (windows - each line has a number below) 
-2. The arguments are: folder_path (where main.py is), where to look for symbol files, output_file, exclusion_file, macro_file, macro_name
-3. @echo off
-4. python "C:\SomeLocation\stock_spreadsheets\api\main.py" "C:\SomeLocation\Downloads" "C:\SomeLocation\Documents\price_sheet.xlsx" "C:\SomeLocation\stock_spreadsheets\ExcludeSymbolsList.xlsx" "C:\SomeLocation\stock_spreadsheets\StockSymbolMacro.xlsm" "ProcessExclusionsAndTotals"
-5. pause
-
-
-## 📌 Requirements
-- **Microsoft Excel (2016 or later recommended)**.
-- **Macros must be enabled** (`File` → `Options` → `Trust Center` → `Enable Macros`).
-- **An exclusion list must be maintained in a separate sheet** (if required for filtering).
-
-## ❓ Troubleshooting
-- **Macro doesn't run?** Ensure macros are **enabled** in Excel settings.
-- **Wrong symbols filtered?** Check if the **exclusion list is correctly formatted**.
-- **Numbers stored as text?** Try converting columns to **Number Format** manually.
-
-## 📜 License
-This project is open-source. Feel free to modify and use it for personal finance tracking.  
+This repo includes:
+- An Excel macro workbook that processes a brokerage positions CSV  
+- A Python helper script to automate file selection and macro execution  
+- Sample positions files and an exclusion list  
 
 ---
+
+## How It Works
+
+1. Download your latest positions CSV from your brokerage.  
+2. Run the Python script (manually or through a batch file).  
+3. The script:
+   - Finds the newest positions file in your download folder  
+   - Copies/renames it to a consistent working file (e.g., `price_sheet.xlsx`)  
+   - Loads Excel  
+   - Executes the macro inside the `.xlsm` workbook  
+4. The macro processes and summarizes the positions into your working Excel file.
+
+This removes the manual steps of opening Excel files, navigating sheets, selecting macros, and handling the CSV each time.
+
+---
+
+## Python Helper Script
+
+`api/main.py` automates the workflow using five arguments:
+
+1. **Download folder** — directory containing brokerage CSV files  
+2. **Output Excel file** — destination for the processed data  
+3. **Exclusion list file** — Excel file listing symbols to exclude  
+4. **Macro workbook** (`.xlsm`) — contains the Excel macro logic  
+5. **Macro name** — the macro to execute (e.g., `ProcessExclusionsAndTotals`)  
+
+The script uses Python and COM automation to load Excel, run the macro, and save the updated workbook.
+
+---
+
+## Example Windows Batch File
+
+```bat
+@echo off
+
+call "C:\path\to\stock_spreadsheets\venv\Scripts\activate.bat"
+python "C:\path\to\stock_spreadsheets\api\main.py" ^
+  "C:\Users\YourName\Downloads" ^
+  "C:\Users\YourName\Documents\price_sheet.xlsx" ^
+  "C:\path\to\stock_spreadsheets\ExcludeSymbolsList.xlsx" ^
+  "C:\path\to\stock_spreadsheets\StockSymbolMacro.xlsm" ^
+  "ProcessExclusionsAndTotals"
+
+pause
+```
+---
+
+## Project Structure
+```stock_spreadsheets/
+├── api/
+│   └── main.py            # Python automation script
+├── ExcludeSymbolsList.xlsx
+├── StockSymbolMacro.xlsm  # Excel macro for processing positions
+├── Sample Positions1.csv
+├── Sample Positions2.csv
+└── README.md
+```
+
+---
+
+## Requirements
+
+- **Windows + Microsoft Excel** (required for COM automation)  
+- **Python 3.x**  
+- **pywin32** (used to control Excel from Python)  
+- Optional: a **Python virtual environment**
+
+Install `pywin32` with:
+
+```bash
+pip install pywin32
+```
+
+## Notes
+
+- The Python script automates Excel; the macro workbook contains the actual processing logic.
+- Sample CSVs are included for testing.
+- Paths in the examples are placeholders—update them for your environment.
+- The batch file is optional but convenient for repeat runs.
+
+## License
+Personal project — no license specified.
