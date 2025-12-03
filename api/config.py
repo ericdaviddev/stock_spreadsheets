@@ -25,3 +25,4 @@ percentage_columns = ["Today's Gain/Loss Percent", "Total Gain/Loss Percent", "P
 
 startsWithColumns = ["The data and information", "Brokerage services are", "Date downloaded"]
 
+account_columns = ["Account Number", "Account Name", "Symbol"]
