@@ -1,5 +1,6 @@
 import gc
 import logging
+from pathlib import Path
 
 def run_macro_on_workbook(excel, macro_workbook, target_workbook, macro_name, exclusion_file_path):
     """
@@ -13,9 +14,13 @@ def run_macro_on_workbook(excel, macro_workbook, target_workbook, macro_name, ex
         exclusion_file_path: Path to workbook containing excluded symbols
     """
     try:
-        # Run the macro
-        full_macro_name = f"'{macro_workbook.Name}'!{macro_name}"
-        excel.Application.Run(full_macro_name, exclusion_file_path)
+        """Run the given macro, passing the exclusion file path as a parameter."""
+        full_macro_name = f"{macro_workbook.Name}!{macro_name}"
+
+        # Ensure we always pass a plain string into Excel, even if a Path is supplied
+        exclusion_file_str = str(exclusion_file_path)
+
+        excel.Application.Run(full_macro_name, exclusion_file_str)
         
         # Save changes made by macro
         target_workbook.Save()
