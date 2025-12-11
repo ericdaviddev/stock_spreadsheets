@@ -285,13 +285,9 @@ def process_data(
 
 def remove_non_numeric_characters(df: pd.DataFrame, columns: List[str]) -> None:
     """
-    Remove non-numeric characters from specified columns in-place.
-
-    Args:
-        df: DataFrame to process
-        columns: List of column names to clean
+    Remove non-numeric characters from specified columns in-place,
+    correctly handling accounting-style negatives like ($824.24).
     """
-    # Only operate on columns that actually exist
     present_columns = [c for c in columns if c in df.columns]
     if not present_columns:
         return
@@ -299,7 +295,21 @@ def remove_non_numeric_characters(df: pd.DataFrame, columns: List[str]) -> None:
     try:
         df[present_columns] = (
             df[present_columns]
-            .replace(r"[^\d.-]", "", regex=True)
+            # 1) Turn "(...)" into "-..."
+            .replace(
+                r"^\s*\(\s*([$\d,.\- ]+)\s*\)\s*$",
+                r"-\1",
+                regex=True,
+            )
+            # 2) Also handle trailing minus like "824.24-" -> "-824.24"
+            .replace(
+                r"^\s*([$\d,.,, ]+)-\s*$",
+                r"-\1",
+                regex=True,
+            )
+            # 3) Strip everything except digits, dot, minus
+            .replace(r"[^\d.\-]", "", regex=True)
+            # 4) Convert to numeric
             .apply(pd.to_numeric, errors="coerce")
         )
     except Exception as e:
