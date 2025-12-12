@@ -156,7 +156,7 @@ def process_files(
             if file_path.suffix.lower() == ".xlsx":
                 df = pd.read_excel(file_path)
             else:
-                df = pd.read_csv(file_path)
+                df = read_positions_csv(file_path)
 
             # Clean the data first
             df = clean_dataframe(df, startsWithColumns)
@@ -187,6 +187,19 @@ def process_files(
             continue
 
     return all_data
+
+def read_positions_csv(file_path: str) -> pd.DataFrame:
+    with open(file_path, encoding="utf-8-sig") as f:
+        header = f.readline().rstrip("\n\r")
+        ncols = len(header.split(","))
+
+    df = pd.read_csv(
+        file_path,
+        usecols=range(ncols),
+        on_bad_lines="warn",
+    ).dropna(how="all")
+
+    return df
 
 
 def process_data(
