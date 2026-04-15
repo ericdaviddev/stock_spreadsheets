@@ -6,9 +6,9 @@ from typing import List, Dict, Any, Optional
 import pandas as pd
 import win32com.client as win32
 
-from config import startsWithColumns, numeric_columns, percentage_columns, account_columns
+from config import starts_with_columns, numeric_columns, percentage_columns, account_columns
 from run_macros import run_macro_on_workbook
-from utils import ExcelFormatter, add_timestamp_to_filename
+from utils import ExcelFormatter, add_timestamp_to_filename, clean_dataframe
 
 # Configure logging
 # Use INFO so info/warning logs are actually written to the file.
@@ -79,8 +79,7 @@ def combine_and_clean_sheets(
     output_file_path: str,
     exclusion_file_path: str,
     macro_file_path: str,
-    macro_name: str,
-    data_types: Optional[Dict[str, Any]] = None,
+    macro_name: str
 ) -> str:
     """
     Combine and clean spreadsheets from a folder into a single main file, then
@@ -92,7 +91,6 @@ def combine_and_clean_sheets(
         exclusion_file_path: Path to get excluded symbols and columns to sum
         macro_file_path: Path to the macro workbook
         macro_name: Name of the macro to run
-        data_types: Optional dictionary specifying data types for columns
 
     Returns:
         str: Path to the processed output file
@@ -103,7 +101,7 @@ def combine_and_clean_sheets(
     try:
         validate_inputs(folder_path, output_file_path, exclusion_file_path, macro_file_path)
 
-        all_dataframes = process_files(folder_path, data_types)
+        all_dataframes = process_files(folder_path)
         if not all_dataframes:
             raise ValueError("No valid files were found to process")
 
@@ -127,14 +125,12 @@ def combine_and_clean_sheets(
 
 def process_files(
     folder_path: str,
-    data_types: Optional[Dict[str, Any]] = None,
 ) -> List[pd.DataFrame]:
     """
     Process Excel and CSV files in the given folder.
 
     Args:
         folder_path: Path to folder containing spreadsheets
-        data_types: Optional dictionary specifying data types for columns
 
     Returns:
         List[pd.DataFrame]: List of processed DataFrames
@@ -159,26 +155,7 @@ def process_files(
                 df = read_positions_csv(file_path)
 
             # Clean the data first
-            df = clean_dataframe(df, startsWithColumns)
-
-            # If you later want data_types back, this is where to apply them.
-            # Example (kept commented for now):
-            #
-            # if data_types:
-            #     for col, dtype in data_types.items():
-            #         if col in df.columns:
-            #             try:
-            #                 if dtype in (float, "float64"):
-            #                     df[col] = pd.to_numeric(df[col], errors="coerce")
-            #                 else:
-            #                     df[col] = df[col].astype(dtype)
-            #             except Exception as type_error:
-            #                 logging.warning(
-            #                     "Could not convert column %s to %s: %s",
-            #                     col,
-            #                     dtype,
-            #                     type_error,
-            #                 )
+            df = clean_dataframe(df, starts_with_columns)
 
             all_data.append(df)
             logging.info("Successfully processed %s", file_path.name)
@@ -328,28 +305,3 @@ def remove_non_numeric_characters(df: pd.DataFrame, columns: List[str]) -> None:
     except Exception as e:
         logging.error("Error cleaning numeric columns: %s", e, exc_info=True)
         raise
-
-
-def clean_dataframe(df: pd.DataFrame, startsWithColumns: List[str]) -> pd.DataFrame:
-    """
-    Clean the DataFrame by removing unwanted rows and standardizing columns.
-
-    Logic:
-    - Remove rows where "Account Number" starts with any prefix in `startsWithColumns`.
-    - Strip whitespace from all object (string) columns.
-
-    Args:
-        df: DataFrame to clean
-        startsWithColumns: List of column prefixes to exclude
-
-    Returns:
-        pd.DataFrame: Cleaned DataFrame
-    """
-    if "Account Number" in df.columns:
-        for prefix in startsWithColumns:
-            df = df[~df["Account Number"].str.startswith(prefix, na=False)]
-
-    for col in df.select_dtypes(include=["object"]).columns:
-        df[col] = df[col].str.strip()
-
-    return df

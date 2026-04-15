@@ -1,5 +1,5 @@
 """Utility functions for Excel operations and data processing."""
-from typing import List, Dict, Any, Optional
+from typing import List, Any, Optional
 import pandas as pd
 from datetime import datetime
 import logging
@@ -73,10 +73,10 @@ class ExcelFormatter:
                     cell_value = ws.Cells(1, col_index).Value  # Assuming headers are in the first row
                     if cell_value and cell_value.strip() == heading:
                         ws.Columns(col_index).AutoFit()  # AutoFit the matched column
-                        print(f"AutoFit applied to column: {heading}")
+                        logging.info(f"AutoFit applied to column: {heading}")
                         break
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
 
 def get_column_index_by_heading(ws: Any, heading: str) -> Optional[int]:
     """Get column index by heading name.

@@ -1,6 +1,14 @@
 import logging
+from typing import Any, Union
+from pathlib import Path
 
-def run_macro_on_workbook(excel, macro_workbook, target_workbook, macro_name, exclusion_file_path):
+def run_macro_on_workbook(
+    excel: Any,
+    macro_workbook: Any,
+    target_workbook: Any,
+    macro_name: str,
+    exclusion_file_path: Union[str, Path]
+) -> None:
     """
     Run a macro from the macro workbook on the target workbook.
 
@@ -12,7 +20,6 @@ def run_macro_on_workbook(excel, macro_workbook, target_workbook, macro_name, ex
         exclusion_file_path: Path to workbook containing excluded symbols
     """
     try:
-        """Run the given macro, passing the exclusion file path as a parameter."""
         full_macro_name = f"{macro_workbook.Name}!{macro_name}"
 
         # Ensure we always pass a plain string into Excel, even if a Path is supplied

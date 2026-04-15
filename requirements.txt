@@ -1,4 +1,11 @@
+# Data processing
 pandas>=1.5.0
+
+# Excel automation via COM
 pywin32>=305
+
+# Excel file writing engine
 xlsxwriter>=3.0.0
+
+# Excel file reading engine used by pandas
 openpyxl>=3.0.0

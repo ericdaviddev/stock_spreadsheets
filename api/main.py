@@ -12,7 +12,6 @@ import argparse
 from pathlib import Path
 
 from combine_spreadsheets import combine_and_clean_sheets
-from config import data_types
 from run_macros import run_macro_on_workbook  # noqa: F401  # imported for side effects / clarity
 
 
@@ -42,8 +41,7 @@ def main(
         output_file_path=str(output_file),
         exclusion_file_path=str(exclusion_file),
         macro_file_path=str(macro_file),
-        macro_name=macro_name,
-        data_types=data_types
+        macro_name=macro_name
     )
 
 
