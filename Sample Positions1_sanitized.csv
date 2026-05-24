@@ -1,0 +1,24 @@
+Account Number,Account Name,Symbol,Description,Quantity,Last Price,Last Price Change,Current Value,Today's Gain/Loss Dollar,Today's Gain/Loss Percent,Total Gain/Loss Dollar,Total Gain/Loss Percent,Percent Of Account,Cost Basis Total,Average Cost Basis,Type
+001,Sample Account,PG,PROCTER AND GAMBLE CO COM,117.915,$49.16 ,$0.64 ,"$5,796.33 ",$75.05 ,1.29%,"$1,864.99 ",47.44%,1.94%,"$3,931.34 ",$33.34 ,Cash
+001,Sample Account,EUSA,ISHARES INC MSCI USA EQUAL WEIGHTED ETF INDEX FD,243.022,$18.26 ,$0.24 ,"$4,437.76 ",$59.16 ,1.33%,($519.35),-10.48%,1.49%,"$4,957.11 ",$20.40 ,Cash
+001,Sample Account,ITOT,ISHARES CORE S&P TOTAL US STOCK MARKET ETF,133.261,$84.11 ,($1.47),"$11,208.57 ",($195.65),-1.75%,"($1,177.89)",-9.51%,3.76%,"$12,386.46 ",$92.95 ,Cash
+001,Sample Account,ANET,ARISTA NETWORKS INC COM SHS,63.923,$268.44 ,($6.30),"$17,159.30 ",($402.73),-2.35%,"$6,630.46 ",62.97%,5.75%,"$10,528.84 ",$164.71 ,Cash
+001,Sample Account,FTNT,FORTINET INC COM USD0.001,137.014,$160.96 ,($0.83),"$22,053.78 ",($114.22),-0.52%,"$4,300.26 ",24.22%,7.40%,"$17,753.52 ",$129.57 ,Cash
+001,Sample Account,EQT,EQT CORP COM,244.422,$96.39 ,$2.03 ,"$23,559.12 ",$495.95 ,2.11%,"$3,205.58 ",15.75%,7.90%,"$20,353.54 ",$83.27 ,Cash
+001,Sample Account,CRWD,CROWDSTRIKE HLDGS INC CL A,205.082,$105.91 ,($0.76),"$21,719.54 ",($156.38),-0.72%,"$1,910.20 ",9.64%,7.28%,"$19,809.34 ",$96.59 ,Cash
+001,Sample Account,AMZN,AMAZON.COM INC,93.388,$53.88 ,$1.29 ,"$5,032.04 ",$120.43 ,2.39%,$198.04 ,4.10%,1.69%,"$4,834.00 ",$51.76 ,Cash
+001,Sample Account,CEG,CONSTELLATION ENERGY CORP COM,215.052,$91.52 ,($2.02),"$19,682.55 ",($435.14),-2.21%,"$3,216.08 ",19.53%,6.60%,"$16,466.47 ",$76.57 ,Cash
+001,Sample Account,IJS,ISHARES S&P SMALL-CAP 600 VALUE ETF,337.748,$14.09 ,($0.23),"$4,757.72 ",($76.63),-1.61%,"$1,792.18 ",60.43%,1.60%,"$2,965.54 ",$8.78 ,Cash
+001,Sample Account,IJR,ISHARES CORE S&P SMALL-CAP E,167.731,$10.30 ,$0.22 ,"$1,727.00 ",$36.13 ,2.09%,$233.81 ,15.66%,0.58%,"$1,493.19 ",$8.90 ,Cash
+001,Sample Account,MCK,MCKESSON CORP,230.123,$106.21 ,($0.58),"$24,442.06 ",($132.40),-0.54%,"$7,860.91 ",47.41%,8.20%,"$16,581.15 ",$72.05 ,Cash
+001,Sample Account,FSPTX,FIDELITY SELECT TECHNOLOGY,195.399,$105.37 ,($2.62),"$20,590.12 ",($512.45),-2.49%,"$3,167.30 ",18.18%,6.90%,"$17,422.82 ",$89.17 ,Cash
+001,Sample Account,TTD,THE TRADE DESK INC COM CL A,108.069,$70.33 ,$1.08 ,"$7,600.02 ",$117.16 ,1.54%,($610.53),-7.44%,2.55%,"$8,210.55 ",$75.98 ,Cash
+001,Sample Account,IEMG,ISHARES CORE MSCI EMERGING MARKETS ETF,156.633,$133.64 ,$3.30 ,"$20,932.25 ",$517.08 ,2.47%,"$5,989.20 ",40.08%,7.02%,"$14,943.05 ",$95.40 ,Cash
+001,Sample Account,APP,APPLOVIN CORP COM CL A,375.051,$15.74 ,$0.18 ,"$5,901.98 ",$67.19 ,1.14%,"$1,156.00 ",24.36%,1.98%,"$4,745.98 ",$12.65 ,Cash
+001,Sample Account,VRTX,VERTEX PHARMACEUTICALS INC,356.156,$35.89 ,($0.81),"$12,782.69 ",($289.49),-2.26%,"($1,861.55)",-12.71%,4.29%,"$14,644.24 ",$41.12 ,Cash
+001,Sample Account,AGG,ISHARES CORE US AGGREGATE BOND ETF,159.010,$107.25 ,$1.77 ,"$17,053.25 ",$281.64 ,1.65%,"($3,840.12)",-18.38%,5.72%,"$20,893.37 ",$131.40 ,Cash
+001,Sample Account,IDXX,IDEXX LABORATORIES INC COM USD0.10,300.577,$48.97 ,($1.06),"$14,717.81 ",($317.69),-2.16%,$603.15 ,4.27%,4.94%,"$14,114.66 ",$46.96 ,Cash
+001,Sample Account,NEE,NEXTERA ENERGY INC COM USD0.01,249.618,$61.56 ,($1.42),"$15,366.12 ",($355.27),-2.31%,"$2,020.65 ",15.14%,5.15%,"$13,345.47 ",$53.46 ,Cash
+001,Sample Account,VWOB,VANGUARD WHITEHALL FDS EM MK GOV BD ETF,20.969,"$1,034.93 ",($9.39),"$21,701.39 ",($196.93),-0.91%,($428.14),-1.93%,7.28%,"$22,129.53 ","$1,055.34 ",Cash
+,,,,,,,,,,,,,,,
+"Synthetic sample data for demonstration only. Values, quantities, gains/losses, account numbers, and account names are randomized.",,,,,,,,,,,,,,,
